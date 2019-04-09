@@ -8,36 +8,36 @@ import (
 	"net/url"
 )
 
-// functionCode is a type for the constants listed below which
+// FunctionCode is a type for the constants listed below which
 // should be provided to Set. The constants correspond to
 // the sFc parameter required by ComSet.
-type functionCode int
+type FunctionCode int
 
 const (
-	NUMREG functionCode = 1
+	NUMREG FunctionCode = 1
 	// 2 -- set numreg
-	POSREG functionCode = 3
-	UALM functionCode = 4
+	POSREG FunctionCode = 3
+	UALM   FunctionCode = 4
 	// 5 -- set ualm_sev
-	RIN functionCode = 6
-	ROUT functionCode = 7
-	DIN functionCode = 8
-	DOUT functionCode = 9
-	GIN functionCode = 10
-	GOUT functionCode = 11
-	AIN functionCode = 12
-	AOUT functionCode = 13
-	SREG functionCode = 14
+	RIN  FunctionCode = 6
+	ROUT FunctionCode = 7
+	DIN  FunctionCode = 8
+	DOUT FunctionCode = 9
+	GIN  FunctionCode = 10
+	GOUT FunctionCode = 11
+	AIN  FunctionCode = 12
+	AOUT FunctionCode = 13
+	SREG FunctionCode = 14
 	// 15 -- set SREG
 	// 16 ??
 	// 17 ??
 	// 18 ??
-	FLAG functionCode = 19
+	FLAG FunctionCode = 19
 )
 
 // Set sets the comment for an item at the provided host.
-func Set(code functionCode, id int, comment string, host string) error {
-	url := fmt.Sprintf("http://%s/karel/ComSet?sComment=%s&sIndx=%d&sFc=%d", host, url.QueryEscape(comment), id, code)
+func Set(code FunctionCode, id int, comment string, host string) error {
+	url := fmt.Sprintf("http://%s/karel/ComSet?sComment=%s&sIndx=%d&sFc=%d", host, url.PathEscape(comment), id, code)
 
 	resp, err := http.Get(url)
 	if err != nil {
