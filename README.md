@@ -14,7 +14,7 @@ Set fanuc data comments via the controller KAREL ComSet tool.
 
     func main() {
     	err := comtool.Set(comtool.NUMREG, 1, "test", "127.0.0.101")
-	if err != nil {
-		fmt.Println(err)
-	}
+    	if err != nil {
+    		fmt.Println(err)
+    	}
     }
