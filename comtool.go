@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
+	"time"
 )
 
 // FunctionCode is a type for the constants listed below which
@@ -35,18 +37,52 @@ const (
 	FLAG FunctionCode = 19
 )
 
+var codes = [...]string{
+	NUMREG: "R",
+	POSREG: "PR",
+	UALM:   "UALM",
+	RIN:    "RI",
+	ROUT:   "RO",
+	DIN:    "DI",
+	DOUT:   "DO",
+	GIN:    "GI",
+	GOUT:   "GO",
+	AIN:    "AI",
+	AOUT:   "AO",
+	SREG:   "SR",
+	FLAG:   "F",
+}
+
+func (f FunctionCode) String() string {
+	s := codes[f]
+	if s != "" {
+		return s
+	}
+
+	return "functionCode(" + strconv.Itoa(int(f)) + ")"
+}
+
 // Set sets the comment for an item at the provided host.
-func Set(code FunctionCode, id int, comment string, host string) error {
+func Set(code FunctionCode, id int, comment string, host string, timeout time.Duration) error {
 	url := fmt.Sprintf("http://%s/karel/ComSet?sComment=%s&sIndx=%d&sFc=%d", host, url.PathEscape(comment), id, code)
 
-	resp, err := http.Get(url)
+	client := http.Client{
+		Timeout: time.Duration(timeout),
+	}
+
+	resp, err := client.Get(url)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("Failed to set comment for code %d id %d comment %s at host %s", code, id, comment, host)
+		switch resp.StatusCode {
+		case http.StatusUnauthorized:
+			return fmt.Errorf("Not authorized to set comment at host %s. Did you unlock KAREL via Setup > Host Comm > HTTP?", host)
+		default:
+			return fmt.Errorf("Failed to set comment for %s[%d], '%s', at host %s: %d", code, id, comment, host, resp.StatusCode)
+		}
 	}
 
 	return nil
