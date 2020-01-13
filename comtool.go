@@ -16,7 +16,8 @@ import (
 type FunctionCode int
 
 const (
-	NUMREG FunctionCode = 1
+	INVALID FunctionCode = 0
+	NUMREG  FunctionCode = 1
 	// 2 -- set numreg
 	POSREG FunctionCode = 3
 	UALM   FunctionCode = 4
