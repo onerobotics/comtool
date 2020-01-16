@@ -3,6 +3,7 @@
 package comtool
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -63,6 +64,19 @@ func (f FunctionCode) String() string {
 	return "functionCode(" + strconv.Itoa(int(f)) + ")"
 }
 
+var (
+	ErrForbidden    = errForbidden()
+	ErrUnauthorized = errUnauthorized()
+)
+
+func errForbidden() error {
+	return errors.New("Forbidden. Please unlock KAREL via Setup > Host Comm > HTTP.")
+}
+
+func errUnauthorized() error {
+	return errors.New("Unauthorized. Please unlock KAREL via Setup > Host Comm > HTTP.")
+}
+
 // Set sets the comment for an item at the provided host.
 func Set(code FunctionCode, id int, comment string, host string, timeout time.Duration) error {
 	url := fmt.Sprintf("http://%s/karel/ComSet?sComment=%s&sIndx=%d&sFc=%d", host, url.PathEscape(comment), id, code)
@@ -79,8 +93,10 @@ func Set(code FunctionCode, id int, comment string, host string, timeout time.Du
 
 	if resp.StatusCode != http.StatusOK {
 		switch resp.StatusCode {
+		case http.StatusForbidden:
+			return ErrForbidden
 		case http.StatusUnauthorized:
-			return fmt.Errorf("Not authorized to set comment at host %s. Did you unlock KAREL via Setup > Host Comm > HTTP?", host)
+			return ErrUnauthorized
 		default:
 			return fmt.Errorf("Failed to set comment for %s[%d], '%s', at host %s: %d", code, id, comment, host, resp.StatusCode)
 		}
