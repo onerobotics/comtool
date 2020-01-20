@@ -1,3 +1,5 @@
+# Deprecated. Use [go-fanuc](https://github.com/onerobotics/go-fanuc) instead.
+
 # comtool
 
 Set fanuc data comments via the controller KAREL ComSet tool.
